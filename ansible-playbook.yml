@@ -1,0 +1,28 @@
+- name: Deploy Flask App with Docker
+  hosts: webserver
+  become: yes
+  tasks:
+    - name: تثبيت Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: نسخ ملفات المشروع
+      copy:
+        src: .
+        dest: /home/ubuntu/flask_app
+        owner: ubuntu
+        group: ubuntu
+        mode: 0755
+
+    - name: تشغيل الكونتينر
+      community.docker.docker_container:
+        name: flask_app
+        image: flask_app_image
+        state: started
+        restart_policy: always
+        published_ports:
+          - "5000:5000"
+        build:
+          path: /home/ubuntu/flask_app
